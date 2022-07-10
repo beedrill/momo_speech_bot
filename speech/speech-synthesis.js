@@ -1,4 +1,4 @@
-const { azureResourceKey, azureRegion } = require("../config.json");
+const { azureResourceKey, azureRegion, speechSynthesisVoiceName } = require("../config.json");
 const sdk = require("microsoft-cognitiveservices-speech-sdk");
 const { PassThrough } = require("stream");
 
@@ -8,7 +8,7 @@ function synthesizeSpeech(text) {
     azureRegion
   );
   // speechConfig.speechSynthesisVoiceName = "en-US-JennyNeural";
-  speechConfig.speechSynthesisVoiceName = "zh-CN-XiaoxiaoNeural";
+  speechConfig.speechSynthesisVoiceName = speechSynthesisVoiceName || "en-US-JennyNeural";
   const synthesizer = new sdk.SpeechSynthesizer(speechConfig);
   return new Promise((resolve, reject) => {
     synthesizer.speakTextAsync(
