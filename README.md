@@ -40,3 +40,6 @@ Now you can start your bot by:
 ```bash
 node index.js
 ```
+
+### Personalize your language preference
+By default, the bot is using `en-US-JennyNeural` voice and English language. You can specify your own by modifying the `config.json` file's **'speechSynthesisVoiceName'** field. You can find the list of different voice here.
