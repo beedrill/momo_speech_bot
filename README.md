@@ -42,4 +42,15 @@ node index.js
 ```
 
 ### Personalize your language preference
-By default, the bot is using `en-US-JennyNeural` voice and English language. You can specify your own by modifying the `config.json` file's **'speechSynthesisVoiceName'** field. You can find the list of different voice here.
+By default, the bot is using `en-US-JennyNeural` voice and English language. You can specify your own by modifying the `config.json` file's **'speechSynthesisVoiceName'** field, for example: 
+```json
+{
+    "discordToken": "OTk1ND**********************WyI",
+    "discordClientId": "9954************************",
+    "azureResourceKey": "bf8dc3***********************",
+    "azureRegion": "eastus",
+    "speechSynthesisVoiceName": "zh-CN-YunxiNeural"
+}
+
+```
+You can find the list of different voice [here](https://docs.microsoft.com/en-us/azure/cognitive-services/speech-service/language-support?tabs=speechtotext#text-to-speech).
