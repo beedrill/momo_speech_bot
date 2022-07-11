@@ -14,7 +14,7 @@ async function probeAndCreateResource(readableStream) {
   return createAudioResource(stream, { inputType: type });
 }
 
-async function checkAndJoinVoiceChannel(interaction) {
+async function checkAndJoinVoiceChannel(interaction, options = {}) {
   const author = interaction.member;
   const voice = author.guild.voiceStates.cache;
   // if (voice.get(author.id) == undefined || voice.get(author.id) == null) {
@@ -33,6 +33,7 @@ async function checkAndJoinVoiceChannel(interaction) {
       channelId: channel.id,
       guildId: channel.guild.id,
       adapterCreator: channel.guild.voiceAdapterCreator,
+      ...options,
     });
     connection.on("stateChange", (oldState, newState) => {
       //   console.log(
