@@ -1,5 +1,9 @@
-# Momo Bot - A Text-To-Speech (TTS) Discord Robot
-This is a simple bot that joins your voice channel and pronounce speech from your text. This bot is based on [Azure Cognitive Service](https://azure.microsoft.com/en-us/services/cognitive-services/#overview). One can quickly deploy a TTS bot based on this source code.
+# Momo Bot - A Speech-to-speech Discord translation robot
+This is a simple Discord bot that does speech translation and speech generation. Currently, this bot can do following functionalities:
+- connect to your voice channel and read the text you want it to read
+- connect to your voice channel and do the real-time translation for you
+
+This bot is based on [Azure Cognitive Service](https://azure.microsoft.com/en-us/services/cognitive-services/#overview). One can quickly deploy a TTS bot based on this source code. 
 
 ## Deploy Guide
 ### Create a Discord Bot

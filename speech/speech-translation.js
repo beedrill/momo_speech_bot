@@ -6,7 +6,7 @@ const speechTranslationConfig = sdk.SpeechTranslationConfig.fromSubscription(
 );
 speechTranslationConfig.speechRecognitionLanguage = "zh-CN";
 
-var language = "ja";
+var language = "en";
 speechTranslationConfig.addTargetLanguage(language);
 
 function translateFromFile(wavData) {

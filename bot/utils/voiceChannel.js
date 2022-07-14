@@ -4,17 +4,22 @@ const {
   demuxProbe,
   createAudioResource,
   NoSubscriberBehavior,
+  EndBehaviorType,
 } = require("@discordjs/voice");
-const {
-  ConsoleLoggingListener,
-} = require("microsoft-cognitiveservices-speech-sdk/distrib/lib/src/common.browser/ConsoleLoggingListener");
+const wavConverter = require("wav-converter");
+const prism = require("prism-media");
+const { streamToBuffer } = require("./stream");
 
 async function probeAndCreateResource(readableStream) {
   const { stream, type } = await demuxProbe(readableStream);
   return createAudioResource(stream, { inputType: type });
 }
 
-async function checkAndJoinVoiceChannel(interaction, options = {}) {
+async function checkAndJoinVoiceChannel(
+  interaction,
+  options = {},
+  noCleanup = false
+) {
   const author = interaction.member;
   const voice = author.guild.voiceStates.cache;
   // if (voice.get(author.id) == undefined || voice.get(author.id) == null) {
@@ -36,30 +41,32 @@ async function checkAndJoinVoiceChannel(interaction, options = {}) {
       ...options,
     });
     connection.on("stateChange", (oldState, newState) => {
-      //   console.log(
-      //     `Connection transitioned from ${oldState.status} to ${newState.status}`
-      //   );
+        console.log(
+          `Connection transitioned from ${oldState.status} to ${newState.status}`
+        );
       if (newState.status == "disconnected") {
         connection.destroy();
       }
     });
-    var cleanupInterval = setInterval(function () {
-      console.log("start cleaning up resources");
-      if (
-        player.state.status == "playing" ||
-        player.state.status == "buffering"
-      ) {
-        return;
-      }
-      try {
-        connection.destroy();
-        player.stop();
-      } catch (err) {
-        console.error(err);
+    if (!noCleanup) {
+      var cleanupInterval = setInterval(function () {
+        console.log("start cleaning up resources");
+        if (
+          player.state.status == "playing" ||
+          player.state.status == "buffering"
+        ) {
+          return;
+        }
+        try {
+          connection.destroy();
+          player.stop();
+        } catch (err) {
+          console.error(err);
+          clearInterval(cleanupInterval);
+        }
         clearInterval(cleanupInterval);
-      }
-      clearInterval(cleanupInterval);
-    }, 60000);
+      }, 60000);
+    }
     const player = createAudioPlayer({
       behaviors: {
         noSubscriber: NoSubscriberBehavior.Pause,
@@ -83,7 +90,31 @@ async function playStream(dataStream, connection, player) {
   });
 }
 
+async function receiveAudioToWav(receiver, userId) {
+  const opusStream = receiver.subscribe(userId, {
+    end: {
+      behavior: EndBehaviorType.AfterSilence,
+      duration: 1000,
+    },
+  });
+  const opusDecoder = new prism.opus.Decoder({
+    frameSize: 960,
+    channels: 2,
+    rate: 48000,
+  });
+  var ms = opusStream.pipe(opusDecoder);
+  var pcmData = await streamToBuffer(ms);
+  console.log('recording done')
+  var wavData = wavConverter.encodeWav(pcmData, {
+    numChannels: 2,
+    sampleRate: 48000,
+    byteRate: 16,
+  });
+  return wavData;
+}
+
 module.exports = {
   checkAndJoinVoiceChannel,
   playStream,
+  receiveAudioToWav,
 };
