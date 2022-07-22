@@ -16,7 +16,7 @@ class TranslationTask extends Task {
       {
         selfDeaf: false,
       },
-      true
+      true //noCleanup
     );
     if (!connection) {
       return;
@@ -39,64 +39,64 @@ class TranslationTask extends Task {
       .setLabel("End")
       .setStyle("SECONDARY");
     const row = new MessageActionRow().addComponents(startButton, endButton);
-
     var msg = await this.interaction.reply({
       content: `Click "Start" button to start recording, the recording will stop automatically when you pause...`,
       ephemeral: true,
       components: [row],
       fetchReply: true,
     });
-    var collector = msg.createMessageComponentCollector({
-      time: 600_000,
-    });
-    collector.on("collect", async (i) => {
-      switch (i.customId) {
-        case "end":
-          this.destroy(
-            "It has been nice to serve you, looking forward to meet you again!"
-          );
-          break;
-        case "start":
-          this.status = "busy";
-          row.components[0].setDisabled(true);
-          row.components[1].setDisabled(true);
-          // await wait(10000);
-          i.deferUpdate();
-          this.interaction.editReply({
-            content: "Recording...You can talk now...",
-            components: [row],
-          });
-          var wavData = await receiveAudioToWav(
-            this.receiver,
-            this.interaction.member.id
-          );
-          this.interaction.editReply({
-            content: "Recording done, translating, one moment...",
-            components: [row],
-          });
-          var translation = await translateFromFile(wavData, this.interaction.serverState.translation);
+    console.log(msg)
+    // var collector = msg.createMessageComponentCollector({
+    //   time: 600_000,
+    // });
+    // collector.on("collect", async (i) => {
+    //   switch (i.customId) {
+    //     case "end":
+    //       this.destroy(
+    //         "It has been nice to serve you, looking forward to meet you again!"
+    //       );
+    //       break;
+    //     case "start":
+    //       this.status = "busy";
+    //       row.components[0].setDisabled(true);
+    //       row.components[1].setDisabled(true);
+    //       // await wait(10000);
+    //       i.deferUpdate();
+    //       this.interaction.editReply({
+    //         content: "Recording...You can talk now...",
+    //         components: [row],
+    //       });
+    //       var wavData = await receiveAudioToWav(
+    //         this.receiver,
+    //         this.interaction.member.id
+    //       );
+    //       this.interaction.editReply({
+    //         content: "Recording done, translating, one moment...",
+    //         components: [row],
+    //       });
+    //       var translation = await translateFromFile(wavData, this.interaction.serverState.translation);
          
-          var lang = this.interaction.serverState.translation.voiceName;
-          // var lang = "en-US-JennyNeural";
-          var x = await synthesizeSpeech(translation, lang);
-          await playStream(x, connection, player);
-          row.components[0].setDisabled(false);
-          row.components[1].setDisabled(false);
-          this.status = "ready";
-          this.interaction.editReply({
-            content: `Click "Start" button to start recording, the recording will stop automatically when you pause...`,
-            ephemeral: true,
-            components: [row],
-            fetchReply: true,
-          });
-          break;
-      }
-    });
-    collector.on("end", async (collected) => {
-      this.destroy(
-        "Reaching session time limit, call '/momo-translate' again to resume. It has been nice to serve you, looking forward to meet you again!"
-      );
-    });
+    //       var lang = this.interaction.serverState.translation.voiceName;
+    //       // var lang = "en-US-JennyNeural";
+    //       var x = await synthesizeSpeech(translation, lang);
+    //       await playStream(x, connection, player);
+    //       row.components[0].setDisabled(false);
+    //       row.components[1].setDisabled(false);
+    //       this.status = "ready";
+    //       this.interaction.editReply({
+    //         content: `Click "Start" button to start recording, the recording will stop automatically when you pause...`,
+    //         ephemeral: true,
+    //         components: [row],
+    //         fetchReply: true,
+    //       });
+    //       break;
+    //   }
+    // });
+    // collector.on("end", async (collected) => {
+    //   this.destroy(
+    //     "Reaching session time limit, call '/momo-translate' again to resume. It has been nice to serve you, looking forward to meet you again!"
+    //   );
+    // });
   }
   destroy(content) {
     this.interaction.editReply({

@@ -1,5 +1,3 @@
-const serverStates = {};
-
 const LanguageSettings = {
   zh: {
     languageCode: "zh",
@@ -30,54 +28,57 @@ const LanguageSettings = {
     label: "Español",
   },
 };
-
-function initState() {
-  return {
-    translation: {
-      startingLang: LanguageSettings.en.locale,
-      targetLang: LanguageSettings.ja.languageCode,
-      voiceName: LanguageSettings.ja.voiceName,
-    },
-  };
-}
-
-function setTranslationTargetLanguage(serverId, languageCode) {
-  var state = serverStates[serverId];
-  if (!state) {
-    throw "no serverState found";
+class ServerStatesHandler {
+  static _serverStates = {};
+  constructor() {}
+  static initState() {
+    return {
+      translation: {
+        startingLang: LanguageSettings.en.locale,
+        targetLang: LanguageSettings.ja.languageCode,
+        voiceName: LanguageSettings.ja.voiceName,
+      },
+    };
   }
-  state.translation.targetLang = languageCode;
-  state.translation.voiceName = LanguageSettings[languageCode].voiceName;
-  setServerState(serverId, state);
-}
-function setTranslationStartingLanguage(serverId, languageCode) {
-  var state = serverStates[serverId];
-  if (!state) {
-    throw "no serverState found";
+
+  setTranslationTargetLanguage(serverId, languageCode) {
+    var state = this.getServerState(serverId);
+    if (!state) {
+      throw "no serverState found";
+    }
+    state.translation.targetLang = languageCode;
+    state.translation.voiceName = LanguageSettings[languageCode].voiceName;
+    this.setServerState(serverId, state);
   }
-  state.translation.startingLang = LanguageSettings[languageCode].locale;
-  setServerState(serverId, state);
+
+  setTranslationStartingLanguage(serverId, languageCode) {
+    var state = this.getServerState(serverId);
+    if (!state) {
+      throw "no serverState found";
+    }
+    state.translation.startingLang = LanguageSettings[languageCode].locale;
+    this.setServerState(serverId, state);
+  }
+
+  setServerState(serverId, newState) {
+    ServerStatesHandler._serverStates[serverId] = newState;
+    // push to database here:
+  }
+
+  getServerState(serverId) {
+    //get from database if you need to
+    var state = ServerStatesHandler._serverStates[serverId];
+    if (!state) {
+      state = ServerStatesHandler.initState();
+      this.setServerState(serverId, state);
+    }
+    return state;
+  }
 }
 
-function setServerState(serverId, newState) {
-  serverStates[serverId] = newState;
-  // push to database here:
-}
-
-function getServerState(serverId) {
-  //get from database if you need to
-  var state = serverStates[serverId];
-  if (!state) {
-    state = initState();
-    setServerState(serverId, state);
-  }
-  return state;
-}
+const serverStatesHandler = new ServerStatesHandler();
 
 module.exports = {
-  getServerState,
-  setServerState,
   LanguageSettings,
-  setTranslationTargetLanguage,
-  setTranslationStartingLanguage,
+  serverStatesHandler,
 };
