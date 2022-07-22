@@ -1,15 +1,17 @@
 const sdk = require("microsoft-cognitiveservices-speech-sdk");
 const fs = require("fs")
-const speechTranslationConfig = sdk.SpeechTranslationConfig.fromSubscription(
-  "bf8dc37b5fb84168b4e9e361ba1edb77",
-  "eastus"
-);
-speechTranslationConfig.speechRecognitionLanguage = "zh-CN";
+const { azureResourceKey, azureRegion } = require("../config.json");
 
-var language = "en";
-speechTranslationConfig.addTargetLanguage(language);
-
-function translateFromFile(wavData) {
+function translateFromFile(wavData, options) {
+  console.log(options)
+  const speechTranslationConfig = sdk.SpeechTranslationConfig.fromSubscription(
+    azureResourceKey,
+    azureRegion
+  );
+  speechTranslationConfig.speechRecognitionLanguage = options.startingLang;
+  
+  var language = options.targetLang;
+  speechTranslationConfig.addTargetLanguage(language);
   let audioConfig = sdk.AudioConfig.fromWavFileInput(wavData);
   let translationRecognizer = new sdk.TranslationRecognizer(
     speechTranslationConfig,

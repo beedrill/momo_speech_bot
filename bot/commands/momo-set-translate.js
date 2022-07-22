@@ -1,0 +1,68 @@
+const { SlashCommandBuilder } = require("@discordjs/builders");
+const { MessageActionRow, MessageSelectMenu } = require("discord.js");
+const {
+  LanguageSettings,
+  setTranslationStartingLanguage,
+  setTranslationTargetLanguage,
+} = require("../states/serverStates");
+
+module.exports = {
+  data: new SlashCommandBuilder()
+    .setName("momo-set-translate")
+    .setDescription("configure translation"),
+  async execute(interaction) {
+    options = [];
+    for (const languageCode in LanguageSettings) {
+      options.push({
+        label: LanguageSettings[languageCode].label,
+        description: LanguageSettings[languageCode].name,
+        value: LanguageSettings[languageCode].languageCode,
+      });
+    }
+    console.log(options);
+    const startingLangSelector = new MessageActionRow().addComponents(
+      new MessageSelectMenu()
+        .setCustomId("startingLangSelector")
+        .setPlaceholder("Select starting language")
+        .addOptions(options)
+    );
+    const targetLangSelector = new MessageActionRow().addComponents(
+      new MessageSelectMenu()
+        .setCustomId("targetLangSelector")
+        .setPlaceholder("Select target language")
+        .addOptions(options)
+    );
+    var msg = await interaction.reply({
+      content: "Please select the language you want to translate...",
+      components: [startingLangSelector, targetLangSelector],
+      fetchReply: true,
+      ephemeral: true,
+    });
+
+    const collector = msg.createMessageComponentCollector({
+      componentType: "SELECT_MENU",
+      time: 60000,
+    });
+    collector.on("collect", (i) => {
+      i.deferUpdate();
+      // console.log(i)
+      var newLangCode = i.values[0];
+      if (i.customId == "startingLangSelector") {
+        setTranslationStartingLanguage(interaction.guildId, newLangCode);
+      } else if (i.customId == "targetLangSelector") {
+        setTranslationTargetLanguage(interaction.guildId, newLangCode);
+      }
+      interaction.editReply(
+        `You have successfully set **${
+          i.customId == "startingLangSelector"
+            ? "Starting Language"
+            : "Target Language"
+        }** to **${LanguageSettings[newLangCode].name}**.`
+      );
+    });
+
+    // collector.on("end", (collected) => {
+    //   console.log(`Collected ${collected.size} interactions.`);
+    // });
+  },
+};

@@ -74,9 +74,10 @@ class TranslationTask extends Task {
             content: "Recording done, translating, one moment...",
             components: [row],
           });
-          var translation = await translateFromFile(wavData);
-          // var lang = "ja-JP-NanamiNeural";
-          var lang = "en-US-JennyNeural";
+          var translation = await translateFromFile(wavData, this.interaction.serverState.translation);
+         
+          var lang = this.interaction.serverState.translation.voiceName;
+          // var lang = "en-US-JennyNeural";
           var x = await synthesizeSpeech(translation, lang);
           await playStream(x, connection, player);
           row.components[0].setDisabled(false);

@@ -2,6 +2,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { Client, Collection, Intents } = require("discord.js");
 const { discordToken } = require("../config.json");
+const { getServerState } = require("./states/serverStates")
 
 require('./deploy-commands.js')
 
@@ -33,6 +34,8 @@ client.on("interactionCreate", async (interaction) => {
   if (!command) return;
 
   try {
+    var state = getServerState(interaction.guildId)
+    interaction.serverState = state
     await command.execute(interaction);
   } catch (error) {
     console.error(error);
