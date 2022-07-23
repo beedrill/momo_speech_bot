@@ -58,3 +58,8 @@ By default, the bot is using `en-US-JennyNeural` voice and English language. You
 
 ```
 You can find the list of different voice [here](https://docs.microsoft.com/en-us/azure/cognitive-services/speech-service/language-support?tabs=speechtotext#text-to-speech).
+
+## Usage
+### Speech Synthesis
+You can call command `/momo-say` to call a robot to your current channel. The command comes with a prompt to ask you to input the things you want to say, like the following figure:
+![synthesis language bot prompt](./docs/speechSynthesis.png)

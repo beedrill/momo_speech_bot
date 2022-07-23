@@ -5,6 +5,7 @@ const { VoiceConnectionStatus } = require("@discordjs/voice");
 const { playStream, receiveAudioToWav } = require("../utils/voiceChannel");
 const { translateFromFile } = require("../../speech/speech-translation.js");
 const { synthesizeSpeech } = require("../../speech/speech-synthesis.js");
+const { serverState } = require("../states/serverStates");
 class TranslationTask extends Task {
   constructor(interaction) {
     super(interaction);
@@ -74,8 +75,11 @@ class TranslationTask extends Task {
             content: "Recording done, translating, one moment...",
             components: [row],
           });
-          var translation = await translateFromFile(wavData, this.interaction.serverState.translation);
-         
+          var translation = await translateFromFile(
+            wavData,
+            this.interaction.serverState.translation
+          );
+
           var lang = this.interaction.serverState.translation.voiceName;
           // var lang = "en-US-JennyNeural";
           var x = await synthesizeSpeech(translation, lang);
@@ -97,21 +101,6 @@ class TranslationTask extends Task {
         "Reaching session time limit, call '/momo-translate' again to resume. It has been nice to serve you, looking forward to meet you again!"
       );
     });
-  }
-  destroy(content) {
-    this.interaction.editReply({
-      content,
-      components: [],
-    });
-    // console.log(this.connection)
-    if (this.connection && this.connection.state.status != "destroyed") {
-      try {
-        this.connection.destroy();
-      } catch (err) {
-        console.error(err);
-      }
-    }
-    this.status = "destroyed";
   }
 }
 
