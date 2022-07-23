@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require("@discordjs/builders");
+const { SlashCommandBuilder } = require("discord.js");
 const { TranslationTask } = require('../tasks/translation-task')
 // const { synthesizeSpeech } = require("../../speech/speech-synthesis.js");
 

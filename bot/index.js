@@ -1,13 +1,13 @@
 const fs = require("node:fs");
 const path = require("node:path");
-const { Client, Collection, Intents } = require("discord.js");
+const { Client, GatewayIntentBits, Collection } = require("discord.js");
 const { discordToken } = require("../config.json");
 const { serverStatesHandler } = require("./states/serverStates")
 
 require('./deploy-commands.js')
 
 const client = new Client({
-  intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_VOICE_STATES],
+  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildVoiceStates],
 });
 
 client.commands = new Collection();
@@ -27,7 +27,7 @@ client.once("ready", () => {
 });
 
 client.on("interactionCreate", async (interaction) => {
-  if (!interaction.isCommand()) return;
+  if (!interaction.isChatInputCommand()) return;
 
   const command = client.commands.get(interaction.commandName);
 
