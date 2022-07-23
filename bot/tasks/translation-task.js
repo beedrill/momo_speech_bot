@@ -5,7 +5,11 @@ const { VoiceConnectionStatus } = require("@discordjs/voice");
 const { playStream, receiveAudioToWav } = require("../utils/voiceChannel");
 const { translateFromFile } = require("../../speech/speech-translation.js");
 const { synthesizeSpeech } = require("../../speech/speech-synthesis.js");
-const { serverState } = require("../states/serverStates");
+const { serverStatesHandler } = require("../states/serverStates");
+const {
+  getLanguageNameFromLanguageCode,
+  getLanguageNameFromLocale,
+} = require("../utils/translation");
 class TranslationTask extends Task {
   constructor(interaction) {
     super(interaction);
@@ -40,8 +44,16 @@ class TranslationTask extends Task {
       .setLabel("End")
       .setStyle(ButtonStyle.Secondary);
     const row = new ActionRowBuilder().addComponents(startButton, endButton);
+    const startingLocale = serverStatesHandler.getServerState(
+      this.interaction.guildId
+    ).translation.startingLang;
+    const startingLangName = getLanguageNameFromLocale(startingLocale);
+    const targetCode = serverStatesHandler.getServerState(
+      this.interaction.guildId
+    ).translation.targetLang;
+    const targetLangName = getLanguageNameFromLanguageCode(targetCode);
     var msg = await this.interaction.reply({
-      content: `Click "Start" button to start recording, the recording will stop automatically when you pause...`,
+      content: `Click "Start" button to start recording, the recording will stop automatically when you pause. You need to speak in **${startingLangName}**, it will be translated in **${targetLangName}**..`,
       ephemeral: true,
       components: [row],
       fetchReply: true,
